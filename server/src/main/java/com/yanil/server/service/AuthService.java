@@ -7,6 +7,7 @@ import com.yanil.server.enums.Role;
 import com.yanil.server.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
@@ -19,7 +20,11 @@ public class AuthService {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
     }
+    @Transactional
     public RegisterResponse register(RegisterRequest registerRequest){
+        if(!registerRequest.getPassword().equals(registerRequest.getConfirmPassword())){
+            throw new IllegalArgumentException("Passwords do not match");
+        }
         if(userRepository.existsByEmail(registerRequest.getEmail())){
             throw new IllegalArgumentException("Email already exists");
         }
